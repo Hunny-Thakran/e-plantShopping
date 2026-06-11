@@ -1,8 +1,55 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { addItem } from "./CartSlice";
 
-function Navbar() {
+const plants = [
+  {
+    id: 1,
+    name: "Snake Plant",
+    price: 15,
+    image: "https://via.placeholder.com/150",
+    category: "Indoor Plants",
+  },
+  {
+    id: 2,
+    name: "Peace Lily",
+    price: 20,
+    image: "https://via.placeholder.com/150",
+    category: "Indoor Plants",
+  },
+  {
+    id: 3,
+    name: "Aloe Vera",
+    price: 12,
+    image: "https://via.placeholder.com/150",
+    category: "Medicinal Plants",
+  },
+  {
+    id: 4,
+    name: "Tulsi",
+    price: 10,
+    image: "https://via.placeholder.com/150",
+    category: "Medicinal Plants",
+  },
+  {
+    id: 5,
+    name: "Rose",
+    price: 18,
+    image: "https://via.placeholder.com/150",
+    category: "Flowering Plants",
+  },
+  {
+    id: 6,
+    name: "Jasmine",
+    price: 16,
+    image: "https://via.placeholder.com/150",
+    category: "Flowering Plants",
+  },
+];
+
+function ProductList() {
+  const dispatch = useDispatch();
+
   const cartItems = useSelector(
     (state) => state.cart.items || []
   );
@@ -12,48 +59,77 @@ function Navbar() {
     0
   );
 
+  const handleAddToCart = (plant) => {
+    dispatch(addItem(plant));
+  };
+
+  const isAdded = (id) => {
+    return cartItems.some((item) => item.id === id);
+  };
+
+  const categories = [...new Set(plants.map((p) => p.category))];
+
   return (
-    <nav
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "15px",
-        backgroundColor: "#4CAF50",
-        color: "white",
-      }}
-    >
-      <h2>Paradise Nursery</h2>
+    <div>
+      <h1>Paradise Nursery</h1>
 
       <div
         style={{
-          display: "flex",
-          gap: "20px",
+          fontSize: "20px",
+          marginBottom: "20px",
         }}
       >
-        <Link
-          to="/"
-          style={{ color: "white" }}
-        >
-          Home
-        </Link>
-
-        <Link
-          to="/products"
-          style={{ color: "white" }}
-        >
-          Plants
-        </Link>
-
-        <Link
-          to="/cart"
-          style={{ color: "white" }}
-        >
-          Cart ({totalQuantity})
-        </Link>
+        Cart Items: {totalQuantity}
       </div>
-    </nav>
+
+      {categories.map((category) => (
+        <div key={category}>
+          <h2>{category}</h2>
+
+          <div
+            style={{
+              display: "flex",
+              gap: "20px",
+              flexWrap: "wrap",
+            }}
+          >
+            {plants
+              .filter((plant) => plant.category === category)
+              .map((plant) => (
+                <div
+                  key={plant.id}
+                  style={{
+                    border: "1px solid #ccc",
+                    padding: "15px",
+                    width: "220px",
+                  }}
+                >
+                  <img
+                    src={plant.image}
+                    alt={plant.name}
+                    width="150"
+                  />
+
+                  <h3>{plant.name}</h3>
+                  <p>${plant.price}</p>
+
+                  <button
+                    onClick={() =>
+                      handleAddToCart(plant)
+                    }
+                    disabled={isAdded(plant.id)}
+                  >
+                    {isAdded(plant.id)
+                      ? "Added to Cart"
+                      : "Add to Cart"}
+                  </button>
+                </div>
+              ))}
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
 
-export default Navbar;
+export default ProductList;
