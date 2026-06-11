@@ -1,52 +1,102 @@
 import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  incrementQuantity,
+  decrementQuantity,
+  removeItem,
+} from "./CartSlice";
 
-function CartItem({
-  item,
-  onIncreaseQuantity,
-  onDecreaseQuantity,
-  onRemoveItem,
-}) {
+function CartItem() {
+  const dispatch = useDispatch();
+
+  const cartItems = useSelector(
+    (state) => state.cart.items || []
+  );
+
+  const calculateTotalAmount = () => {
+    return cartItems.reduce(
+      (total, item) =>
+        total + item.price * item.quantity,
+      0
+    );
+  };
+
+  const handleIncrement = (id) => {
+    dispatch(incrementQuantity(id));
+  };
+
+  const handleDecrement = (id) => {
+    const item = cartItems.find(
+      (item) => item.id === id
+    );
+
+    if (item.quantity === 1) {
+      dispatch(removeItem(id));
+    } else {
+      dispatch(decrementQuantity(id));
+    }
+  };
+
   return (
-    <div
-      className="cart-item"
-      style={{
-        border: "1px solid #ccc",
-        padding: "15px",
-        margin: "10px",
-      }}
-    >
-      <img
-        src={item.image}
-        alt={item.name}
-        width="120"
-        height="120"
-      />
+    <div>
+      <h1>Shopping Cart</h1>
 
-      <h3>{item.name}</h3>
-      <p>Price: ${item.price}</p>
-      <p>Quantity: {item.quantity}</p>
+      {cartItems.length === 0 ? (
+        <h2>Your cart is empty</h2>
+      ) : (
+        <>
+          {cartItems.map((item) => (
+            <div
+              key={item.id}
+              style={{
+                border: "1px solid #ccc",
+                padding: "15px",
+                margin: "10px",
+              }}
+            >
+              <img
+                src={item.image}
+                alt={item.name}
+                width="120"
+              />
 
-      <div>
-        <button onClick={() => onIncreaseQuantity(item.id)}>
-          +
-        </button>
+              <h3>{item.name}</h3>
 
-        <button
-          onClick={() => onDecreaseQuantity(item.id)}
-          disabled={item.quantity <= 1}
-        >
-          -
-        </button>
-      </div>
+              <p>Price: ${item.price}</p>
 
-      <p>Total: ${item.price * item.quantity}</p>
+              <p>Quantity: {item.quantity}</p>
 
-      <button
-        onClick={() => onRemoveItem(item.id)}
-        style={{ marginTop: "10px" }}
-      >
-        Remove Item
-      </button>
+              <p>
+                Item Total: $
+                {item.price * item.quantity}
+              </p>
+
+              <button
+                onClick={() =>
+                  handleIncrement(item.id)
+                }
+              >
+                +
+              </button>
+
+              <button
+                onClick={() =>
+                  handleDecrement(item.id)
+                }
+              >
+                -
+              </button>
+            </div>
+          ))}
+
+          <hr />
+
+          <h2>
+            Total Cart Amount: $
+            {calculateTotalAmount()}
+          </h2>
+        </>
+      )}
     </div>
   );
 }
