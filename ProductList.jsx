@@ -1,62 +1,86 @@
-import React, { useState } from "react";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addItem } from "./CartSlice";
 
 const plants = [
   {
     id: 1,
     name: "Snake Plant",
     price: 15,
+    image: "https://via.placeholder.com/150",
     category: "Indoor Plants",
-    image: "https://via.placeholder.com/200",
   },
   {
     id: 2,
     name: "Peace Lily",
     price: 20,
+    image: "https://via.placeholder.com/150",
     category: "Indoor Plants",
-    image: "https://via.placeholder.com/200",
   },
   {
     id: 3,
-    name: "Rose",
-    price: 18,
-    category: "Flowering Plants",
-    image: "https://via.placeholder.com/200",
+    name: "Aloe Vera",
+    price: 12,
+    image: "https://via.placeholder.com/150",
+    category: "Medicinal Plants",
   },
   {
     id: 4,
-    name: "Jasmine",
-    price: 22,
-    category: "Flowering Plants",
-    image: "https://via.placeholder.com/200",
+    name: "Tulsi",
+    price: 10,
+    image: "https://via.placeholder.com/150",
+    category: "Medicinal Plants",
   },
   {
     id: 5,
-    name: "Aloe Vera",
-    price: 12,
-    category: "Medicinal Plants",
-    image: "https://via.placeholder.com/200",
+    name: "Rose",
+    price: 18,
+    image: "https://via.placeholder.com/150",
+    category: "Flowering Plants",
   },
   {
     id: 6,
-    name: "Tulsi",
-    price: 10,
-    category: "Medicinal Plants",
-    image: "https://via.placeholder.com/200",
+    name: "Jasmine",
+    price: 16,
+    image: "https://via.placeholder.com/150",
+    category: "Flowering Plants",
   },
 ];
 
 function ProductList() {
-  const [addedItems, setAddedItems] = useState([]);
+  const dispatch = useDispatch();
 
-  const handleAddToCart = (id) => {
-    setAddedItems([...addedItems, id]);
+  const cartItems = useSelector(
+    (state) => state.cart.items || []
+  );
+
+  const totalQuantity = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+
+  const handleAddToCart = (plant) => {
+    dispatch(addItem(plant));
   };
 
-  const categories = [...new Set(plants.map((plant) => plant.category))];
+  const isAdded = (id) => {
+    return cartItems.some((item) => item.id === id);
+  };
+
+  const categories = [...new Set(plants.map((p) => p.category))];
 
   return (
-    <div className="product-list">
+    <div>
       <h1>Paradise Nursery</h1>
+
+      <div
+        style={{
+          fontSize: "20px",
+          marginBottom: "20px",
+        }}
+      >
+        Cart Items: {totalQuantity}
+      </div>
 
       {categories.map((category) => (
         <div key={category}>
@@ -65,8 +89,8 @@ function ProductList() {
           <div
             style={{
               display: "flex",
-              flexWrap: "wrap",
               gap: "20px",
+              flexWrap: "wrap",
             }}
           >
             {plants
@@ -83,17 +107,19 @@ function ProductList() {
                   <img
                     src={plant.image}
                     alt={plant.name}
-                    width="200"
-                    height="200"
+                    width="150"
                   />
+
                   <h3>{plant.name}</h3>
                   <p>${plant.price}</p>
 
                   <button
-                    onClick={() => handleAddToCart(plant.id)}
-                    disabled={addedItems.includes(plant.id)}
+                    onClick={() =>
+                      handleAddToCart(plant)
+                    }
+                    disabled={isAdded(plant.id)}
                   >
-                    {addedItems.includes(plant.id)
+                    {isAdded(plant.id)
                       ? "Added to Cart"
                       : "Add to Cart"}
                   </button>
