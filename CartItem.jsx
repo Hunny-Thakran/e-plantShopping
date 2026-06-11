@@ -1,104 +1,59 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import {
-  incrementQuantity,
-  decrementQuantity,
-  removeItem,
-} from "./CartSlice";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-function CartItem() {
-  const dispatch = useDispatch();
-
+function Navbar() {
   const cartItems = useSelector(
     (state) => state.cart.items || []
   );
 
-  const calculateTotalAmount = () => {
-    return cartItems.reduce(
-      (total, item) =>
-        total + item.price * item.quantity,
-      0
-    );
-  };
-
-  const handleIncrement = (id) => {
-    dispatch(incrementQuantity(id));
-  };
-
-  const handleDecrement = (id) => {
-    const item = cartItems.find(
-      (item) => item.id === id
-    );
-
-    if (item.quantity === 1) {
-      dispatch(removeItem(id));
-    } else {
-      dispatch(decrementQuantity(id));
-    }
-  };
+  const totalQuantity = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
 
   return (
-    <div>
-      <h1>Shopping Cart</h1>
+    <nav
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: "15px",
+        backgroundColor: "#4CAF50",
+        color: "white",
+      }}
+    >
+      <h2>Paradise Nursery</h2>
 
-      {cartItems.length === 0 ? (
-        <h2>Your cart is empty</h2>
-      ) : (
-        <>
-          {cartItems.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                border: "1px solid #ccc",
-                padding: "15px",
-                margin: "10px",
-              }}
-            >
-              <img
-                src={item.image}
-                alt={item.name}
-                width="120"
-              />
+      <div
+        style={{
+          display: "flex",
+          gap: "20px",
+        }}
+      >
+        <Link
+          to="/"
+          style={{ color: "white" }}
+        >
+          Home
+        </Link>
 
-              <h3>{item.name}</h3>
+        <Link
+          to="/products"
+          style={{ color: "white" }}
+        >
+          Plants
+        </Link>
 
-              <p>Price: ${item.price}</p>
-
-              <p>Quantity: {item.quantity}</p>
-
-              <p>
-                Item Total: $
-                {item.price * item.quantity}
-              </p>
-
-              <button
-                onClick={() =>
-                  handleIncrement(item.id)
-                }
-              >
-                +
-              </button>
-
-              <button
-                onClick={() =>
-                  handleDecrement(item.id)
-                }
-              >
-                -
-              </button>
-            </div>
-          ))}
-
-          <hr />
-
-          <h2>
-            Total Cart Amount: $
-            {calculateTotalAmount()}
-          </h2>
-        </>
-      )}
-    </div>
+        <Link
+          to="/cart"
+          style={{ color: "white" }}
+        >
+          Cart ({totalQuantity})
+        </Link>
+      </div>
+    </nav>
   );
 }
 
-export default CartItem;
+export default Navbar;
